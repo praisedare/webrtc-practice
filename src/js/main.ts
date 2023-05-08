@@ -5,6 +5,7 @@ const videoCanvas = <HTMLCanvasElement>document.getElementById('video_canvas'),
     ctx = videoCanvas.getContext('2d')!,
     createCallBtn = <HTMLButtonElement>document.querySelector('#create_call'),
     answerCallBtn = <HTMLButtonElement>document.querySelector('#answer_call'),
+    hangupBtn = <HTMLButtonElement>document.querySelector('#hangup'),
     callIdInput = <HTMLInputElement>document.querySelector('#call_id'),
     callLinkInput = <HTMLInputElement>document.querySelector('#call_link'),
     videoElem = <HTMLVideoElement>document.querySelector('#video'),
@@ -19,6 +20,7 @@ if (callIdInput.value) {
 
 createCallBtn.onclick = createCall
 answerCallBtn.onclick = answerCall
+hangupBtn.onclick = endCall
 
 const pc = new RTCPeerConnection({
     iceServers: [
@@ -30,6 +32,7 @@ const pc = new RTCPeerConnection({
             "username": "13dd810dcac30bd7ee24ea93",
             "credential": "pp4k9WA3rMYxz1u0"
         },
+
         // {
         //     "urls": "turn:a.relay.metered.ca:80?transport=tcp",
         //     "username": "13dd810dcac30bd7ee24ea93",
@@ -51,6 +54,13 @@ const pc = new RTCPeerConnection({
     //     "stun:stun4.l.google.com:19302"
     // ],
     iceCandidatePoolSize: 10,
+})
+
+pc.addEventListener('connectionstatechange', function(event) {
+    let connectionState = event.target!.connectionState
+    if (['closed', 'disconnected'].includes(connectionState)) {
+        removeVideoElements()
+    }
 })
 
 let localStream: MediaStream
@@ -116,8 +126,7 @@ async function createCall() {
     let answerCandidates = collection(callDocRef, 'answerCandidates')
 
     pc.onicecandidate = (event) => {
-        if (event.candidate)
-            addDoc(offerCandidates, event.candidate.toJSON());
+        event.candidate && addDoc(offerCandidates, event.candidate.toJSON());
     };
 
     // Create offer
@@ -201,6 +210,20 @@ async function answerCall() {
             }
         })
     })
+}
+
+function endCall() {
+    pc.close()
+    localStream.getTracks().forEach(track => track.stop())
+
+    removeVideoElements()
+}
+
+function removeVideoElements() {
+    videoElem.srcObject = null
+    videoElem.remove()
+    remoteVideo.srcObject = null
+    remoteVideo.remove()
 }
 
 function addDataToFirestoreCollection(collectionName: string, data: Object) {

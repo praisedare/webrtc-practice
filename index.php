@@ -39,6 +39,7 @@
 
         <button id="create_call" hidden>Create Call</button>
         <button id="answer_call" hidden>Answer Call</button>
+        <button id="hangup">Hang up</button>
     </div>
 
     <script src="<?= vite_asset('src/js/main.ts') ?>"></script>
