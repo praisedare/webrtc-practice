@@ -25,13 +25,19 @@ hangupBtn.onclick = endCall
 const pc = new RTCPeerConnection({
     iceServers: [
         {
-            "urls": "stun:a.relay.metered.ca:80"
+            "urls": "stun://localhost:8180",
+            "username": 'user',
+            "credential": 'pass',
         },
-        {
-            "urls": "turn:a.relay.metered.ca:80",
-            "username": "13dd810dcac30bd7ee24ea93",
-            "credential": "pp4k9WA3rMYxz1u0"
-        },
+
+        // {
+        //     "urls": "stun:a.relay.metered.ca:80"
+        // },
+        // {
+        //     "urls": "turn:a.relay.metered.ca:80",
+        //     "username": "13dd810dcac30bd7ee24ea93",
+        //     "credential": "pp4k9WA3rMYxz1u0"
+        // },
 
         // {
         //     "urls": "turn:a.relay.metered.ca:80?transport=tcp",
